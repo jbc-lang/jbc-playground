@@ -1,0 +1,10 @@
+SUBROUTINE GET.STATUS(Rec, Answer)
+$INSERT I_STATUS
+BEGIN CASE
+CASE Rec<STATUS.FIELD> EQ ACTIVE
+    Answer = 'open'
+CASE 1
+    Answer = 'closed'
+END CASE
+RETURN
+END
