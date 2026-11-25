@@ -107,6 +107,13 @@ button:disabled { cursor: default; opacity: 0.5; }
   gap: 0.65rem;
 }
 .actions { flex-wrap: wrap; }
+.issues-link {
+  color: var(--secondary);
+  font-size: 0.875rem;
+  text-underline-offset: 0.2em;
+  white-space: nowrap;
+}
+.issues-link:hover { color: var(--text); }
 #project-picker { position: relative; }
 #project-picker summary {
   padding: 0.35rem 0.65rem;
