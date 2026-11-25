@@ -67,7 +67,9 @@ the tag skips execution on nonproduction origins.
 The production page embeds the Google tag for GA4 stream `G-NCPVZT08XG`.
 The repository's Actions variable `JBCC_ENABLE_ANALYTICS=1` enables it
 for production deployments. The tag runs only on
-`https://online.jbc-lang.org` and sends a cookieless page view. URLs
+`https://online.jbc-lang.org`. It grants analytics storage by default,
+so GA4 sets its first-party cookies and counts the page view in its
+reports, and keeps all advertising storage and signals denied. URLs
 with query strings skip measurement because GA4 can read search terms
 from them. The tag runs in the editor page's origin. The Wasm runner
 stays sandboxed.
