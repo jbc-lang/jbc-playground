@@ -1,0 +1,44 @@
+    <script>
+      (() => {
+        const origin = "https://online.jbc-lang.org";
+        // Enhanced Measurement can read search terms from the actual URL.
+        if (location.origin !== origin || location.search) return;
+
+        const measurement = "G-NCPVZT08XG";
+        const pageLocation = origin + "/";
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = function () { window.dataLayer.push(arguments); };
+        const gtag = window.gtag;
+
+        gtag("consent", "default", {
+          ad_storage: "denied",
+          ad_user_data: "denied",
+          ad_personalization: "denied",
+          analytics_storage: "denied",
+        });
+        gtag("set", {
+          ads_data_redaction: true,
+          page_location: pageLocation,
+          page_referrer: "",
+          send_page_view: false,
+        });
+        gtag("js", new Date());
+        gtag("config", measurement, {
+          client_id: Array.from(crypto.getRandomValues(new Uint32Array(2))).join("."),
+          send_page_view: false,
+          allow_google_signals: false,
+          allow_ad_personalization_signals: false,
+        });
+        gtag("event", "page_view", {
+          send_to: measurement,
+          page_location: pageLocation,
+          page_title: "jBC Playground",
+        });
+
+        const script = document.createElement("script");
+        script.async = true;
+        script.referrerPolicy = "no-referrer";
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurement}`;
+        document.head.append(script);
+      })();
+    </script>

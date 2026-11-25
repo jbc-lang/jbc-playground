@@ -9,10 +9,7 @@ const wheelAsset = `python/${wheelName}`;
 const { devDependencies } = await Bun.file("package.json").json();
 const pyodide = `toolchain/pyodide-${devDependencies.pyodide}`;
 const clang = `toolchain/clang-${devDependencies["@yowasp/clang"]}`;
-const analytics = process.env.JBCC_ANALYTICS_FRAME && new URL(process.env.JBCC_ANALYTICS_FRAME);
-if (analytics && (analytics.protocol !== "https:" || analytics.username || analytics.password || analytics.search || analytics.hash)) {
-  throw new Error("JBCC_ANALYTICS_FRAME must be an HTTPS URL without credentials, query, or fragment");
-}
+const analytics = process.env.JBCC_ENABLE_ANALYTICS === "1";
 
 async function bundle(options) {
   const result = await Bun.build({ target: "browser", ...options });
@@ -36,7 +33,7 @@ await Promise.all(["examples", "python", pyodide].map((path) =>
   mkdir(join(output, path), { recursive: true })));
 await Promise.all([
   bundle({
-    entrypoints: analytics ? ["web/editor.ts", "web/analytics.ts"] : ["web/editor.ts"],
+    entrypoints: ["web/editor.ts"],
     outdir: output,
     splitting: true,
   }),
@@ -64,10 +61,8 @@ await Promise.all([
 
 const html = await readFile("web/index.html", "utf8");
 const stamp = new Date().toISOString().slice(0, 16);
-const analyticsScript = '    <script type="module" src="./analytics.js"></script>\n';
-const page = analytics
-  ? html.replace('data-compiler="browser"', `data-compiler="browser" data-analytics-frame="${analytics.href}"`)
-  : html.replace(analyticsScript, "");
+const googleTag = analytics ? (await readFile("web/google-tag.html", "utf8")).trimEnd() : "";
+const page = html.replace("    <!-- google-tag -->", googleTag);
 await writeFile(join(output, "index.html"), page
   .replace("__BUILD_TIME_ISO__", `${stamp}:00Z`)
   .replace("__BUILD_TIME_LABEL__", stamp.replaceAll("-", ".").replace("T", " ")));
@@ -84,13 +79,4 @@ await writeFile(join(output, "runner.html"), runner.replace(
   '  <script src="./runner.js"></script>',
   `  <meta http-equiv="Content-Security-Policy" content="${policy}">\n  <script>${script}</script>`,
 ));
-if (analytics) {
-  const tagCheck = await readFile("analytics/tag-check.html", "utf8");
-  const initializer = tagCheck.match(/<script>([\s\S]+?)<\/script>/)?.[1];
-  if (!initializer) throw new Error("Could not find the Google tag initializer");
-  const tagPolicy = `default-src 'none'; script-src 'sha256-${scriptHash(initializer)}' https://www.googletagmanager.com; base-uri 'none'; form-action 'none'`;
-  await writeFile(join(output, "tag-check.html"), tagCheck.replace(
-    "    <title>", `    <meta http-equiv="Content-Security-Policy" content="${tagPolicy}">\n    <title>`,
-  ));
-}
 console.log(`Built ${output}`);
