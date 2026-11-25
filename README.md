@@ -5,17 +5,59 @@ browser at [online.jbc-lang.org](https://online.jbc-lang.org/).
 The [jbcc repository](https://github.com/jbc-lang/jbcc) maintains the
 compiler, runtime, and native CLI.
 
+## How the playground works
+
+GitHub Pages serves the editor and toolchain files. Compilation and
+execution happen in your browser.
+
+```mermaid
+flowchart LR
+    A["Editor: main file, routines, includes"] --> B["jbcc on Pyodide"]
+    B --> C["Generated C99 with the jBC runtime"]
+    C --> D["YoWASP Clang / LLD"]
+    D --> E["program.wasm"]
+    E --> F["Sandboxed WASI worker"]
+    F --> G["Console output and exit status"]
+```
+
+1. **Pyodide runs the jBC compiler.** Pyodide is CPython compiled to Wasm.
+   On the first **Run**, a browser worker starts Pyodide and loads the pinned
+   `jbcc 0.2.0` Python wheel. The site build downloads the wheel from PyPI,
+   verifies its SHA-256 hash, and serves it with the other static assets.
+   [Compiler worker](web/compile-worker.ts) · [Pyodide](https://pyodide.org/en/stable/project/about.html)
+2. **jbcc translates jBC to C.** The Python adapter stages the project in a
+   temporary virtual filesystem. jbcc expands `$INSERT` and `$INCLUDE`,
+   resolves linked routines, and emits one C99 translation with the jBC
+   runtime included. The editor can show translation diagnostics at the
+   original file, line, and column. [Project adapter](browser.py)
+3. **Clang and LLD build the Wasm program.** After translation succeeds, the
+   worker loads the Wasm builds of YoWASP Clang and LLD. They compile and
+   link the generated C against the WASI C library to produce
+   `program.wasm`. [Clang invocation](web/compile-worker.ts#L71)
+4. **A separate worker runs the program.** The editor sends the compiled
+   Wasm and the prefilled standard input to a fresh worker inside a
+   sandboxed iframe. A JavaScript WASI shim provides standard streams,
+   clocks, and randomness. `INPUT` reads the supplied bytes through EOF.
+   The worker streams stdout and stderr to the console and reports the
+   exit status. The program has no mounted directories or access to the
+   editor, saved projects, or network.
+   [Runner](web/runner.ts) · [WASI imports](web/wasi-program.ts)
+
+Opening the editor downloads no Wasm. A first successful **Run** downloads
+roughly 33 MB on a cold browser cache. Later runs in the same tab reuse the
+initialized compiler worker and start a fresh execution worker for each
+program. A build can take up to two minutes. A program can run for five
+seconds and use up to 64 MiB of Wasm memory and 64 KiB of combined output.
+**Stop** cancels either phase.
+[Compiler lifecycle](web/browser-compiler.ts) · [Run limits](web/runner.ts#L32)
+
 ## Local development
 
 With Bun, Python 3, and Just installed, run `just dev` and open
 <http://127.0.0.1:18767/>. This builds `dist/playground` and serves it with
-Python's static HTTP server. The build downloads the pinned
-[jbcc 0.2.0 wheel](https://pypi.org/project/jbcc/0.2.0/), verifies its
-SHA-256, and serves it with the rest of the site. **Run** loads the
-compiler on demand.
-The worker uses Pyodide for jbcc and Clang/LLD for the generated C, and a
-separate sandboxed worker runs the Wasm. The browser saves the working
-draft in localStorage. Use **Project name** and **Save** to keep a named
+Python's static HTTP server.
+
+The browser saves the working draft in localStorage. Use **Project name** and **Save** to keep a named
 project in IndexedDB. **Projects** lists the names, and **Load** opens the
 chosen save after confirmation. Edits to a saved or loaded project
 autosave after a short pause. If another tab updates the same name, the
@@ -60,9 +102,10 @@ matching wheel for the native comparisons.
 ## Publishing
 
 GitHub Actions builds and tests pull requests and publishes the static
-artifact to GitHub Pages when changes land on `main`. GitHub Pages serves
-the custom domain `online.jbc-lang.org`. Local builds omit Analytics, and
-the tag skips execution on nonproduction origins.
+artifact to GitHub Pages when changes land on `main`. README-only changes
+skip this workflow. You can run it manually from the Actions tab.
+GitHub Pages serves the custom domain `online.jbc-lang.org`. Local builds
+omit Analytics, and the tag skips execution on nonproduction origins.
 
 The production page embeds the Google tag for GA4 stream `G-NCPVZT08XG`.
 The repository's Actions variable `JBCC_ENABLE_ANALYTICS=1` enables it
@@ -86,16 +129,12 @@ by `$INSERT` or `$INCLUDE` and can stay unchecked. An include searches
 relative to its source file, then relative to the project root. Paths
 are case-sensitive. Drafts and the theme are saved in the browser.
 
-**Run** compiles the project and executes the Wasm in an isolated browser
-worker if compilation succeeds. Fill **Standard input**
-before running a program that reads with `INPUT`. **Stop** cancels a
-build or terminates a running program. The runner allows five seconds,
-64 MiB of Wasm memory, and 64 KiB of combined console output.
+Fill **Standard input** before running a program that reads with
+`INPUT`. Click **Run** to compile and execute the project.
 The **?** button opens help for files, routines, limits, and browser projects.
 
 This version targets console programs. The compiler reports source
 locations for unsupported operations such as shell commands, sequential
 files and devices, terminal cursor and keyboard controls, timed input,
 native C calls, and printer output. Live keystrokes, jBASE file
-backends, and T24 services are unavailable. Standard input is a
-prefilled byte stream that ends when consumed.
+backends, and T24 services are unavailable.
