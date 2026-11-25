@@ -1,8 +1,7 @@
 # jBC Playground
 
 The jBC playground compiles and runs multi-file jBC projects in your
-browser. The standalone build is available on
-[GitHub Pages](https://jbc-lang.github.io/jbc-playground/).
+browser at [online.jbc-lang.org](https://online.jbc-lang.org/).
 The [jbcc repository](https://github.com/jbc-lang/jbcc) maintains the
 compiler, runtime, and native CLI.
 
@@ -61,12 +60,13 @@ matching wheel for the native comparisons.
 ## Publishing
 
 GitHub Actions builds and tests pull requests and publishes the static
-artifact when changes land on `main`. The preview loads under
-`/jbc-playground/`, and local and preview builds omit Analytics.
+artifact to GitHub Pages when changes land on `main`. GitHub Pages serves
+the custom domain `online.jbc-lang.org`. Local builds omit Analytics, and
+the tag skips execution on nonproduction origins.
 
 The production page embeds the Google tag for GA4 stream `G-NCPVZT08XG`.
-For the production deployment, set the repository's Actions variable
-`JBCC_ENABLE_ANALYTICS` to `1`. The tag runs only on
+The repository's Actions variable `JBCC_ENABLE_ANALYTICS=1` enables it
+for production deployments. The tag runs only on
 `https://online.jbc-lang.org` and sends a cookieless page view. URLs
 with query strings skip measurement because GA4 can read search terms
 from them. The tag runs in the editor page's origin. The Wasm runner
