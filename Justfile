@@ -1,3 +1,5 @@
+set positional-arguments
+
 # Build the static playground.
 build:
     bun install --frozen-lockfile
@@ -5,8 +7,8 @@ build:
 
 # Build and serve the playground locally.
 dev port="18767": build
-    python3 -m http.server {{port}} --bind 127.0.0.1 --directory dist/playground
+    python3 -m http.server "$1" --bind 127.0.0.1 --directory dist/playground
 
 # Build and run the browser suite.
 test *args: build
-    bunx playwright test {{args}}
+    bunx playwright test "$@"
