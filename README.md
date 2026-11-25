@@ -105,15 +105,11 @@ GitHub Actions builds and tests pull requests and publishes the static
 artifact to GitHub Pages when changes land on `main`. README-only changes
 skip this workflow. You can run it manually from the Actions tab.
 GitHub Pages serves the custom domain `online.jbc-lang.org`. Local builds
-omit Analytics, and the tag skips execution on nonproduction origins.
+omit Analytics.
 
-The production page embeds the Google tag for GA4 stream `G-NCPVZT08XG`.
+The production page loads Google Tag Manager container `GTM-5QTPTVWF`.
 The repository's Actions variable `JBCC_ENABLE_ANALYTICS=1` enables it
-for production deployments. The tag runs only on
-`https://online.jbc-lang.org` and sends a cookieless page view. URLs
-with query strings skip measurement because GA4 can read search terms
-from them. The tag runs in the editor page's origin. The Wasm runner
-stays sandboxed.
+for production deployments.
 
 To render the production HTML locally, run
 `JBCC_ENABLE_ANALYTICS=1 bun build-static.mjs`. Serve it at localhost
