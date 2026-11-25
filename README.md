@@ -64,6 +64,18 @@ GitHub Actions builds and tests pull requests and publishes the static
 artifact when changes land on `main`. The preview loads under
 `/jbc-playground/`, and local and preview builds omit Analytics.
 
+The production page embeds the Google tag for GA4 stream `G-NCPVZT08XG`.
+For the production deployment, set the repository's Actions variable
+`JBCC_ENABLE_ANALYTICS` to `1`. The tag runs only on
+`https://online.jbc-lang.org` and sends a cookieless page view. URLs
+with query strings skip measurement because GA4 can read search terms
+from them. The tag runs in the editor page's origin. The Wasm runner
+stays sandboxed.
+
+To render the production HTML locally, run
+`JBCC_ENABLE_ANALYTICS=1 bun build-static.mjs`. Serve it at localhost
+to inspect the generated page without sending Analytics.
+
 ## Writing and running programs
 
 The editor starts with `hello.b`. Choose **Status lookup (3 files)** to

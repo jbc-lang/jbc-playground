@@ -29,6 +29,11 @@ jobs:
         run: |
           bunx playwright install --with-deps chromium
           bunx playwright test
+      - name: Add the production Google tag
+        if: github.ref == 'refs/heads/main' && vars.JBCC_ENABLE_ANALYTICS == '1'
+        env:
+          JBCC_ENABLE_ANALYTICS: '1'
+        run: bun build-static.mjs
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         if: github.ref == 'refs/heads/main'
         with:
