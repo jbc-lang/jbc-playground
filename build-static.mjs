@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { copyFile, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { downloadWheel, wheelName } from "./jbcc-wheel.mjs";
+import { downloadWheel, version as jbccVersion, wheelName } from "./jbcc-wheel.mjs";
 
 process.chdir(import.meta.dir);
 const output = "dist/playground";
@@ -65,7 +65,8 @@ const googleTag = analytics ? (await readFile("web/google-tag.html", "utf8")).tr
 const page = html.replace("    <!-- google-tag -->", googleTag);
 await writeFile(join(output, "index.html"), page
   .replace("__BUILD_TIME_ISO__", `${stamp}:00Z`)
-  .replace("__BUILD_TIME_LABEL__", stamp.replaceAll("-", ".").replace("T", " ")));
+  .replace("__BUILD_TIME_LABEL__", stamp.replaceAll("-", ".").replace("T", " "))
+  .replaceAll("__JBCC_VERSION__", jbccVersion));
 
 const [[frame], [program]] = await Promise.all([
   bundle({ entrypoints: ["web/runner.ts"], format: "iife" }),
