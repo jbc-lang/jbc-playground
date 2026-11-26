@@ -87,6 +87,11 @@ transparent textarea draws the colours, so typing, undo and selection stay the
 textarea's. The words come from `web/jbc-words.json`, which `just words`
 writes from the pinned jbcc; run it after changing the jbcc version.
 
+The bug button at the top opens the "Problem report" issue form with the
+open file, the browser and the build time filled in through the form's
+address. The reporter reviews them on GitHub before submitting. A source that
+would make the address longer than about 7,000 characters is cut short.
+
 Use **Export** to download the open project as a versioned JSON file.
 **Import** can open it in another browser profile. Exports contain the project name, files, **Main**,
 linked routines, selected tab, and prefilled stdin.
