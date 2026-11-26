@@ -15,7 +15,8 @@ test("the bug button opens the problem report with the source, browser and build
   expect(address.searchParams.get("template")).toBe("bug.yml");
   expect(address.searchParams.get("source")).toBe("CRT \"Grüße\"\n");
   expect(address.searchParams.get("browser")).not.toBe("");
-  expect(address.searchParams.get("build")).toBe(await page.locator("#build-time").textContent());
+  expect(address.searchParams.get("build")).toBe(await page.locator("#build-info").textContent());
+  expect(address.searchParams.get("build")).toMatch(/ \/ jbcc \d+\.\d+\.\d+$/);
   await expect(page.locator(".issues-link")).toHaveAttribute("target", "_blank");
 });
 

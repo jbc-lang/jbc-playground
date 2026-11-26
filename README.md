@@ -22,7 +22,7 @@ flowchart LR
 
 1. **Pyodide runs the jBC compiler.** Pyodide is CPython compiled to Wasm.
    On the first **Run**, a browser worker starts Pyodide and loads the pinned
-   `jbcc 0.2.0` Python wheel. The site build downloads the wheel from PyPI,
+   `jbcc 0.3.0` Python wheel. The site build downloads the wheel from PyPI,
    verifies its SHA-256 hash, and serves it with the other static assets.
    [Compiler worker](web/compile-worker.ts) · [Pyodide](https://pyodide.org/en/stable/project/about.html)
 2. **jbcc translates jBC to C.** The Python adapter stages the project in a
@@ -87,9 +87,12 @@ transparent textarea draws the colours, so typing, undo and selection stay the
 textarea's. The words come from `web/jbc-words.json`, which `just words`
 writes from the pinned jbcc; run it after changing the jbcc version.
 
+The header shows the build time (UTC) and the pinned jbcc version, which
+links to its PyPI page. The build inserts the version from `jbcc-wheel.mjs`.
+
 The bug button at the top opens the "Problem report" issue form with the
-open file, the browser and the build time filled in through the form's
-address. The reporter reviews them on GitHub before submitting. A source that
+open file, the browser, and the build time and jbcc version filled in
+through the form's address. The reporter reviews them on GitHub before submitting. A source that
 would make the address longer than about 7,000 characters is cut short.
 
 Use **Export** to download the open project as a versioned JSON file.

@@ -411,7 +411,7 @@ function issueAddress() {
     template: "bug.yml",
     source,
     browser: browserName(),
-    build: element("build-time").textContent ?? "",
+    build: element("build-info").textContent ?? "",
   });
   const file = current();
   let source = draft.files.length > 1 ? `${file.path}:\n${file.source}` : file.source;

@@ -106,6 +106,9 @@ test("fills the desktop height, shows build time, and keeps the theme toggle acc
   const buildTime = page.locator("#build-time");
   await expect(buildTime).toHaveText(/^\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}$/);
   await expect(buildTime).toHaveAttribute("datetime", /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00Z$/);
+  const { version } = await import("../jbcc-wheel.mjs");
+  await expect(page.locator("#build-info")).toHaveText(new RegExp(`^\\d{4}\\.\\d{2}\\.\\d{2} \\d{2}:\\d{2} / jbcc ${version.replaceAll(".", "\\.")}$`));
+  await expect(page.locator("#jbcc-version")).toHaveAttribute("href", `https://pypi.org/project/jbcc/${version}/`);
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   const dark = page.getByRole("button", { name: "Switch to dark theme", exact: true });
   await expect(dark).toHaveText("☾");
