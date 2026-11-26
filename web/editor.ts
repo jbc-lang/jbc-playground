@@ -56,6 +56,11 @@ const exampleFiles = {
   fibonacci: ["fibonacci.b"],
   factorial: ["factorial.b"],
   rule110: ["rule110.b"],
+  fizzbuzz: ["fizzbuzz.b"],
+  sieve: ["sieve.b"],
+  hanoi: ["hanoi.b"],
+  quine: ["quine.b"],
+  quine2: ["quine2.b"],
   status: ["caller.b", "get.status.b", "I_STATUS"],
 };
 

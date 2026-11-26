@@ -49,7 +49,7 @@ test("runs Hello and Status lookup, then reloads the multi-file draft", async ({
   await expect(page.getByLabel("Main", { exact: true })).toHaveValue("caller.b");
 });
 
-for (const example of ["fibonacci", "factorial", "rule110"]) {
+for (const example of ["fibonacci", "factorial", "rule110", "fizzbuzz", "sieve", "hanoi", "quine", "quine2"]) {
   test(`runs the ${example} example with native output`, async ({ page }) => {
     await openEditor(page);
     page.once("dialog", (dialog) => void dialog.accept());
