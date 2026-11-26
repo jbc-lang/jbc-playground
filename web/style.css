@@ -68,9 +68,10 @@ input, #stdin { padding: 0.42rem 0.55rem; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 button:not(:disabled):hover { border-color: var(--accent); }
 button:disabled { cursor: default; opacity: 0.5; }
+/* One height for the top bar's buttons; the theme and help buttons are square. */
+.actions button { height: 2.15rem; }
 #theme, #help {
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.15rem;
   padding: 0;
   line-height: 1;
 }
@@ -125,13 +126,19 @@ button:disabled { cursor: default; opacity: 0.5; }
   gap: 0.65rem;
 }
 .actions { flex-wrap: wrap; }
+/* A link to GitHub Issues, drawn like the square buttons beside it. */
 .issues-link {
-  color: var(--secondary);
-  font-size: 0.875rem;
-  text-underline-offset: 0.2em;
-  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--editor);
+  color: var(--text);
 }
-.issues-link:hover { color: var(--text); }
+.issues-link:hover { border-color: var(--accent); }
 #project-picker { position: relative; }
 #project-picker summary {
   padding: 0.35rem 0.65rem;
