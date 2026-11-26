@@ -13,6 +13,14 @@
   --error-line: #492e32;
   --error-column: #794446;
   --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  /* Code colours of the jBC guide's code blocks. */
+  --code-function: #ffb17a;
+  --code-statement: #ffff99;
+  --code-number: #afd66f;
+  --code-system: #f5896f;
+  --code-string: #85c5dc;
+  --code-comment: #8b9097;
+  --code-label: #c9a7ff;
 }
 
 :root[data-theme="light"] {
@@ -29,6 +37,14 @@
   --error: #952c23;
   --error-line: #fae2df;
   --error-column: #f3b8b0;
+  /* The same hues, dark enough for a white editor. */
+  --code-function: #a6460b;
+  --code-statement: #6b5a00;
+  --code-number: #3f6b0f;
+  --code-system: #b0321a;
+  --code-string: #17647e;
+  --code-comment: #687280;
+  --code-label: #6a3fb5;
 }
 
 * { box-sizing: border-box; }
@@ -243,7 +259,7 @@ main {
   min-height: 0;
   background: var(--editor);
 }
-#source, #lines, #source-measure {
+#source, #lines, #source-measure, #source-colors {
   padding: 0.85rem 0.75rem;
   font: 0.9375rem/1.55 var(--mono);
   margin: 0;
@@ -273,6 +289,50 @@ main {
   background: transparent;
   resize: none;
   tab-size: 4;
+}
+/* The coloured copy sits under the textarea, whose text turns transparent
+   once the copy is drawn; caret and selection stay the textarea's. */
+#source-colors {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  white-space: pre;
+  tab-size: 4;
+  color: var(--text);
+  pointer-events: none;
+}
+#source-colors > code {
+  display: block;
+  font: inherit;
+  transform: translate(calc(-1 * var(--scroll-left, 0px)), calc(-1 * var(--scroll-top, 0px)));
+}
+.colored #source {
+  color: transparent;
+  caret-color: var(--text);
+}
+.colored #source::selection {
+  color: transparent;
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+#source-colors .c-0fun { color: var(--code-function); }
+#source-colors .c-1com { color: var(--code-statement); }
+#source-colors .c-2num { color: var(--code-number); }
+#source-colors .c-3typ { color: var(--code-system); }
+#source-colors .c-4str { color: var(--code-string); }
+#source-colors .c-5com { color: var(--code-comment); font-style: italic; }
+#source-colors .c-label { color: var(--code-label); font-weight: 600; }
+#source-colors .c-unavailable {
+  text-decoration: underline dotted var(--error);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+#source-hint {
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  border-top: 1px solid var(--border);
+  color: var(--error);
+  font-size: 0.85rem;
 }
 #source-measure {
   position: absolute;

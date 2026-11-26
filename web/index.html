@@ -84,10 +84,12 @@
             <div id="source-mark" aria-hidden="true" hidden>
               <div id="error-line"><span id="error-column" hidden></span></div>
             </div>
+            <pre id="source-colors" aria-hidden="true"></pre>
             <span id="source-measure" aria-hidden="true"></span>
             <textarea id="source" aria-label="jBC source" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
           </div>
         </div>
+        <p id="source-hint" aria-live="polite" hidden></p>
       </section>
       <section class="pane results" aria-label="Build and run results">
         <div class="pane-header">
@@ -140,6 +142,15 @@
             compilation succeeds. Click a diagnostic’s file and line to jump to it. For a
             program that uses <code>INPUT</code>, fill in <strong>Standard input</strong>
             before running. <strong>Stop</strong> cancels a build or stops a running program.</p>
+        </section>
+        <section>
+          <h3>Colours and warnings</h3>
+          <p>The editor colours statements, functions, strings, numbers, <code>@</code>
+            variables, comments and labels as you type. It follows the jBC compiler's word
+            lists but doesn't parse the program, so an unusual line may be coloured wrongly.
+            A dotted red underline marks a statement the playground can't run, such as
+            <code>EXECUTE</code> or <code>OPENSEQ</code>, and the line under the editor names
+            them before you click <strong>Run</strong>.</p>
         </section>
         <section>
           <h3>Program limits</h3>

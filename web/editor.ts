@@ -1,4 +1,5 @@
 import { compileInBrowser, type Diagnostic } from "./browser-compiler";
+import { highlight, unavailableNames } from "./highlight";
 import {
   exportProject, importProject, listProjects, projectName, readProject, writeProject,
   type Draft, type SourceFile,
@@ -33,6 +34,8 @@ const sourceMark = element("source-mark");
 const errorLine = element("error-line");
 const errorColumn = element("error-column");
 const sourceMeasure = element("source-measure");
+const sourceColors = element("source-colors");
+const sourceHint = element("source-hint");
 const filename = element<HTMLInputElement>("filename");
 const entrySelect = element<HTMLSelectElement>("entry");
 const unit = element<HTMLInputElement>("unit");
@@ -186,6 +189,25 @@ function replaceDraft(value: Draft, binding?: { name: string; revision: number }
   status.textContent = "Ready";
 }
 
+// The coloured copy of the source behind the transparent textarea.
+function renderColors() {
+  const html = highlight(editor.value);
+  sourceColors.innerHTML = `<code>${html}</code>`;
+  sizeColors();
+  const names = unavailableNames(html);
+  sourceHint.hidden = names.length === 0;
+  sourceHint.textContent = names.length
+    ? `Not available in the browser: ${names.join(", ")}. The build will stop there.`
+    : "";
+  editor.parentElement!.classList.add("colored");
+}
+
+function sizeColors() {
+  sourceColors.style.width = `${editor.clientWidth}px`;
+  sourceColors.style.height = `${editor.clientHeight}px`;
+  syncEditorScroll();
+}
+
 function numberLines() {
   const count = editor.value.split("\n").length;
   lines.textContent = Array.from({ length: count }, (_, i) => i + 1).join("\n");
@@ -237,6 +259,7 @@ function render() {
   editor.setSelectionRange(view?.start ?? 0, view?.end ?? 0);
   editor.scrollTop = view?.top ?? 0;
   editor.scrollLeft = view?.left ?? 0;
+  renderColors();
   numberLines();
   renderSourceMark();
 }
@@ -369,6 +392,9 @@ function reportInvalidLink() {
 
 function syncEditorScroll() {
   lines.scrollTop = editor.scrollTop;
+  // A transform follows fractional scroll positions, which scrollTop rounds.
+  sourceColors.style.setProperty("--scroll-top", `${editor.scrollTop}px`);
+  sourceColors.style.setProperty("--scroll-left", `${editor.scrollLeft}px`);
   sourceMark.style.setProperty("--scroll-top", `${editor.scrollTop}px`);
   sourceMark.style.setProperty("--scroll-left", `${editor.scrollLeft}px`);
 }
@@ -703,12 +729,16 @@ function applyTheme(light: boolean) {
 
 editor.addEventListener("input", () => {
   current().source = editor.value;
+  renderColors();
   numberLines();
   renderSourceMark();
   save();
 });
 editor.addEventListener("scroll", syncEditorScroll);
-new ResizeObserver(() => renderSourceMark()).observe(editor);
+new ResizeObserver(() => {
+  renderSourceMark();
+  sizeColors();
+}).observe(editor);
 stdin.addEventListener("input", () => { draft.stdin = stdin.value; save(); });
 window.addEventListener("pagehide", flushDraft);
 document.addEventListener("visibilitychange", () => {
