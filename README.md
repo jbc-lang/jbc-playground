@@ -107,7 +107,7 @@ skip this workflow. You can run it manually from the Actions tab.
 GitHub Pages serves the custom domain `online.jbc-lang.org`. Local builds
 omit Analytics.
 
-The production page loads Google Tag Manager container `GTM-5QTPTVWF`.
+The production page loads the Google tag for GA4 measurement ID `G-NCPVZT08XG`.
 The repository's Actions variable `JBCC_ENABLE_ANALYTICS=1` enables it
 for production deployments.
 
