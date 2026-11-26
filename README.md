@@ -76,6 +76,17 @@ keeps it in localStorage (`jbcc.playground.previous-draft`) and offers
 **Restore previous draft**. A link opened in a tab that already shows the
 playground asks before replacing the draft.
 
+The editor colours jBC as you type: statements, functions, strings, numbers,
+`@` variables, comments and labels, in the colours of the jBC guide's code
+blocks. `web/highlight.ts` makes one pass over each line, so it approximates
+the language rather than parsing it: jBC has no reserved words, and a variable
+named like a keyword is coloured as one. A dotted underline marks statements
+that jbcc refuses in the browser (`EXECUTE`, `OPENSEQ`, `PERFORM`...), and a
+line under the editor names them before you run. A `<pre>` behind the
+transparent textarea draws the colours, so typing, undo and selection stay the
+textarea's. The words come from `web/jbc-words.json`, which `just words`
+writes from the pinned jbcc; run it after changing the jbcc version.
+
 Use **Export** to download the open project as a versioned JSON file.
 **Import** can open it in another browser profile. Exports contain the project name, files, **Main**,
 linked routines, selected tab, and prefilled stdin.
