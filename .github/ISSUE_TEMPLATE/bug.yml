@@ -1,0 +1,55 @@
+name: Problem report
+description: Something in online.jbc-lang.org doesn't work, or a program builds or runs wrongly there.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. It doesn't matter whether the editor or the compiler is at fault:
+        compiler problems are moved to [jbcc](https://github.com/jbc-lang/jbcc) from here.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where it goes wrong
+      options:
+        - Editor, buttons or layout
+        - Saving, loading, export or import of projects
+        - Build fails or the diagnostic is wrong
+        - The program prints or returns something wrong
+        - Run from the jBC guide
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Choose "Status lookup" in Example
+        2. Click Run
+        3. ...
+  - type: textarea
+    id: source
+    attributes:
+      label: jBC source
+      description: The program, cut down if you can. For a project of several files, attach its Export file instead.
+      render: text
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and operating system
+      placeholder: "Chrome 142 on Windows 11"
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Playground build
+      description: The date and time next to "jBC Playground" at the top of the page.
+      placeholder: "2026.11.26 14:22"
