@@ -106,10 +106,14 @@ test("fills the desktop height, shows build time, and keeps the theme toggle acc
   const buildTime = page.locator("#build-time");
   await expect(buildTime).toHaveText(/^\d{4}\.\d{2}\.\d{2} \d{2}:\d{2}$/);
   await expect(buildTime).toHaveAttribute("datetime", /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00Z$/);
-  const light = page.getByRole("button", { name: "Switch to light theme", exact: true });
-  await expect(light).toHaveText("☀︎");
-  await light.click();
-  await expect(page.getByRole("button", { name: "Switch to dark theme", exact: true })).toHaveText("☾");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  const dark = page.getByRole("button", { name: "Switch to dark theme", exact: true });
+  await expect(dark).toHaveText("☾");
+  await dark.click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("button", { name: "Switch to light theme", exact: true })).toHaveText("☀︎");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
 });
@@ -126,6 +130,10 @@ test("opens and dismisses playground help on desktop and mobile", async ({ page 
   await expect(close).toBeFocused();
   await expect(dialog.getByRole("heading", { name: "Link as routine" })).toBeVisible();
   await expect(dialog.getByRole("heading", { name: "Save, load, and back up projects" })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Where your work is stored" })).toBeVisible();
+  await expect(dialog.getByRole("heading", { name: "Running examples from the jBC guide" })).toBeVisible();
+  const wide = await dialog.boundingBox();
+  expect(wide!.width).toBeCloseTo(1440 * 0.9, -1);
   await page.keyboard.press("Control+Enter");
   await expect(page.locator("#status")).toHaveText("Ready");
   await page.keyboard.press("Escape");
@@ -138,7 +146,7 @@ test("opens and dismisses playground help on desktop and mobile", async ({ page 
   expect(box).not.toBeNull();
   expect(box!.width).toBeLessThan(390);
   expect(box!.height).toBeLessThan(680);
-  const lastParagraph = dialog.getByText("The browser also keeps a local draft", { exact: false }).filter({ visible: true });
+  const lastParagraph = dialog.getByText("asks before replacing the draft", { exact: false }).filter({ visible: true });
   await lastParagraph.scrollIntoViewIfNeeded();
   await expect(lastParagraph).toBeInViewport();
   await close.click();

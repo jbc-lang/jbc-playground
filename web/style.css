@@ -61,7 +61,7 @@ button:disabled { cursor: default; opacity: 0.5; }
 #theme { font-size: 1.3rem; }
 #help { font-size: 1.1rem; font-weight: 700; }
 #help-dialog {
-  width: min(46rem, calc(100% - 2rem));
+  width: min(90vw, calc(100% - 2rem));
   max-width: none;
   max-height: calc(100dvh - 2rem);
   padding: 0;
@@ -84,14 +84,16 @@ button:disabled { cursor: default; opacity: 0.5; }
 }
 .help-header h2 { font-size: 1.2rem; }
 .help-content {
-  display: grid;
-  gap: 1rem;
+  columns: 24rem;
+  column-gap: 2rem;
   padding: 1.1rem 1.25rem 1.35rem;
   line-height: 1.55;
 }
+.help-content section { break-inside: avoid; margin-bottom: 1rem; }
 .help-content h3 { font-size: 1rem; }
-.help-content p, .help-content ol { margin: 0.35rem 0 0; }
-.help-content ol { padding-inline-start: 1.3rem; }
+.help-content a { color: var(--accent); }
+.help-content p, .help-content ol, .help-content ul { margin: 0.35rem 0 0; }
+.help-content ol, .help-content ul { padding-inline-start: 1.3rem; }
 .help-content li + li { margin-top: 0.35rem; }
 .help-content code { font-family: var(--mono); }
 .primary {
