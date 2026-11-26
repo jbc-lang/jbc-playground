@@ -50,6 +50,8 @@ const helpButton = element<HTMLButtonElement>("help");
 const helpDialog = element<HTMLDialogElement>("help-dialog");
 
 const draftKey = "jbcc.playground.draft";
+const previousKey = "jbcc.playground.previous-draft";
+const maxLinkedSource = 64 * 1024;
 const themeKey = "jbcc.playground.theme";
 const exampleFiles = {
   hello: ["hello.b"],
@@ -304,6 +306,65 @@ async function loadExample(key: keyof typeof exampleFiles) {
   } catch {
     if (!activity) status.textContent = "Could not load example";
   }
+}
+
+// A link such as https://online.jbc-lang.org/#name=locate&code=<base64url>
+// opens that source as a new draft; the jBC guide's "Run" buttons make them.
+// The source travels in the fragment, so it never reaches a server, and the
+// fragment is removed at once so that a reload does not open it again.
+type LinkedSource = { path: string; source: string; name: string };
+
+function linkedSource(): LinkedSource | "invalid" | null {
+  const params = new URLSearchParams(location.hash.slice(1));
+  const code = params.get("code");
+  if (code === null) return null;
+  history.replaceState(null, "", location.pathname + location.search);
+  try {
+    const binary = atob(code.replace(/-/g, "+").replace(/_/g, "/"));
+    if (binary.length > maxLinkedSource) return "invalid";
+    const source = new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+    const name = params.get("name") ?? "";
+    const safe = /^[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}$/.test(name);
+    return { path: safe ? `${name}.b` : "main.b", source, name: safe ? name : "" };
+  } catch {
+    return "invalid";
+  }
+}
+
+function forgetPrevious() {
+  try {
+    localStorage.removeItem(previousKey);
+  } catch {
+    // Browser storage is unavailable, so nothing was kept either.
+  }
+}
+
+function openLinked(linked: LinkedSource) {
+  // Keep the draft the link replaces unless it is empty or a saved project
+  // without unsaved changes, which stays in the browser's projects anyway.
+  const unsaved = !localProject || localProject.savedVersion !== draftVersion;
+  const kept = unsaved && draft.files.some((file) => file.source.trim()) &&
+    putStorage(previousKey, JSON.stringify(draft));
+  if (!kept) forgetPrevious();
+  replaceDraft({ files: [{ path: linked.path, source: linked.source }], entry: linked.path, active: linked.path, units: [], stdin: "" });
+  projectNameField.value = "draft";
+  projectStatus.textContent = linked.name ? `Opened ${linked.name} from a link` : "Opened from a link";
+  if (!kept) return;
+  projectStatus.append(" · ", button("Restore previous draft", () => {
+    try {
+      const value = JSON.parse(getStorage(previousKey) ?? "null") as Draft;
+      if (!value?.files?.some((file) => file.path === value.active)) throw new Error();
+      replaceDraft({ files: value.files, entry: value.entry, units: value.units, active: value.active, stdin: value.stdin });
+      forgetPrevious();
+      projectStatus.textContent = "Previous draft restored";
+    } catch {
+      projectStatus.textContent = "Could not restore the previous draft";
+    }
+  }));
+}
+
+function reportInvalidLink() {
+  projectStatus.textContent = "Could not open the linked source";
 }
 
 function syncEditorScroll() {
@@ -710,7 +771,8 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-applyTheme(getStorage(themeKey) === "light");
+// Light unless the dark theme was chosen; index.html starts light too.
+applyTheme(getStorage(themeKey) !== "dark");
 stdin.value = draft.stdin;
 render();
 if (localProject) {
@@ -718,4 +780,14 @@ if (localProject) {
   projectStatus.textContent = `Autosaving ${localProject.name}`;
   if (localProject.savedVersion !== draftVersion) scheduleSave();
 }
-if (!saved) void loadExample("hello");
+const linked = linkedSource();
+if (linked && linked !== "invalid") openLinked(linked);
+else if (!saved) void loadExample("hello");
+if (linked === "invalid") reportInvalidLink();
+// A link opened in a tab that already shows the playground.
+window.addEventListener("hashchange", () => {
+  const next = linkedSource();
+  if (!next) return;
+  if (next === "invalid") reportInvalidLink();
+  else if (!activity && !projectBusy && confirm("Replace the current draft with the linked source?")) openLinked(next);
+});
