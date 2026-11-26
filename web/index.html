@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-compiler="browser">
+<html lang="en" data-compiler="browser" data-theme="light">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -16,7 +16,7 @@
         <time id="build-time" datetime="__BUILD_TIME_ISO__" title="Build time (UTC)">__BUILD_TIME_LABEL__</time>
       </div>
       <div class="actions">
-        <button type="button" id="theme" aria-label="Switch to light theme" title="Switch to light theme">☀︎</button>
+        <button type="button" id="theme" aria-label="Switch to dark theme" title="Switch to dark theme">☾</button>
         <button type="button" id="run" class="primary" title="Run (Ctrl or Command + Enter)">Run</button>
         <button type="button" id="stop" disabled>Stop</button>
         <button type="button" id="help" aria-label="Playground help" aria-haspopup="dialog" aria-controls="help-dialog" title="Help">?</button>
@@ -157,10 +157,47 @@
             <li>After you save or load a named project, changes autosave to that name.
               To save a copy under a different name, enter it and click <strong>Save</strong>.</li>
           </ol>
-          <p>The browser also keeps a local draft as you edit. To back up a project or
-            move it to another browser, click <strong>Export</strong> to download a file.
-            Use <strong>Import</strong> to open a project file. Clearing this site's data removes
-            browser saves.</p>
+          <p>To back up a project or move it to another browser, click <strong>Export</strong>
+            to download a file. Use <strong>Import</strong> to open a project file.</p>
+        </section>
+        <section>
+          <h3>Where your work is stored</h3>
+          <p>Everything stays in this browser. Your files are never uploaded: the compiler
+            and your program run on this page, and the program has no network access.</p>
+          <ul>
+            <li><strong>The working draft</strong>, the files you see now with
+              <strong>Main</strong>, linked routines and standard input, is kept in the
+              browser's local storage as you type, and comes back when you reopen the page.</li>
+            <li><strong>Named projects</strong> from <strong>Save</strong> are kept in the
+              browser's IndexedDB database for this site.</li>
+            <li>Both belong to this browser profile on this device. Another browser, another
+              profile or a private window does not see them, and a private window forgets them
+              when it closes.</li>
+            <li>All tabs of the playground share the one working draft, so the tab you typed
+              in last decides what the next visit shows. A named project that another tab
+              changed is reported as a conflict instead of being overwritten.</li>
+            <li>Clearing this site's data in the browser settings deletes the draft and every
+              named project. Use <strong>Export</strong> for anything you want to keep.</li>
+          </ul>
+        </section>
+        <section>
+          <h3>Running examples from the jBC guide</h3>
+          <p>Examples in the <a href="https://jbc-lang.org/" target="_blank" rel="noopener">jBC
+            Programmers Reference Guide</a> that the playground can build have a
+            <strong>Run</strong> button. It opens the example here in a new tab:</p>
+          <ul>
+            <li>The example arrives in the address after <code>#</code>, a part that the
+              browser never sends to a server, and is removed from the address bar at once.</li>
+            <li>It opens as a single file named after the chapter, such as
+              <code>locate.b</code>. It does not run until you click <strong>Run</strong>.</li>
+            <li>If the working draft it replaces had unsaved work, the playground keeps it:
+              <strong>Restore previous draft</strong> appears next to <strong>Project
+              name</strong>. Only the latest replaced draft is kept. Named projects are never
+              touched, and the example is not saved into one until you click
+              <strong>Save</strong>.</li>
+            <li>A Run link opened in a tab that already shows the playground asks before
+              replacing the draft.</li>
+          </ul>
         </section>
       </div>
     </dialog>
