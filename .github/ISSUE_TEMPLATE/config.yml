@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Missing statement or function
+    url: https://github.com/jbc-lang/jbcc/issues/new?template=unsupported.yml
+    about: The build says a statement or function is unsupported. jbcc, the compiler, tracks those.
+  - name: Question about the jBC language
+    url: https://github.com/jbc-lang/jbcc/discussions
+    about: Ask in the compiler's Discussions, or read the jBC Programmers Reference Guide at jbc-lang.org.
+  - name: Security vulnerability
+    url: https://github.com/jbc-lang/jbc-playground/security/advisories/new
+    about: For example, a way out of the sandbox that runs programs. Report it privately, not as a public issue.
