@@ -390,6 +390,38 @@ function reportInvalidLink() {
   projectStatus.textContent = "Could not open the linked source";
 }
 
+// The bug button opens the "Problem report" issue form with the open file,
+// the browser and this build filled in; the reporter sees all of it on GitHub
+// before submitting. Addresses longer than about 8 KB fail, so a long source
+// is cut short.
+const issueForm = "https://github.com/jbc-lang/jbc-playground/issues/new";
+const maxIssueAddress = 7000;
+const issuesLink = document.querySelector<HTMLAnchorElement>(".issues-link")!;
+
+type BrowserBrands = { brands?: { brand: string; version: string }[]; platform?: string };
+
+function browserName() {
+  const data = (navigator as Navigator & { userAgentData?: BrowserBrands }).userAgentData;
+  const brand = data?.brands?.find((item) => !/Not.?A.?Brand|Chromium/i.test(item.brand)) ?? data?.brands?.[0];
+  return brand ? `${brand.brand} ${brand.version}${data?.platform ? ` on ${data.platform}` : ""}` : navigator.userAgent;
+}
+
+function issueAddress() {
+  const params = (source: string) => new URLSearchParams({
+    template: "bug.yml",
+    source,
+    browser: browserName(),
+    build: element("build-time").textContent ?? "",
+  });
+  const file = current();
+  let source = draft.files.length > 1 ? `${file.path}:\n${file.source}` : file.source;
+  while (`${issueForm}?${params(source)}`.length > maxIssueAddress) {
+    source = source.slice(0, Math.floor(source.length * 0.8));
+  }
+  if (source.length < file.source.length) source += "\n... (cut short; attach the Export file for the whole project)";
+  return `${issueForm}?${params(source)}`;
+}
+
 function syncEditorScroll() {
   lines.scrollTop = editor.scrollTop;
   // A transform follows fractional scroll positions, which scrollTop rounds.
@@ -735,6 +767,10 @@ editor.addEventListener("input", () => {
   save();
 });
 editor.addEventListener("scroll", syncEditorScroll);
+// Built when used, so the address carries the source as it is now.
+for (const type of ["pointerdown", "focus", "click", "contextmenu"]) {
+  issuesLink.addEventListener(type, () => { issuesLink.href = issueAddress(); });
+}
 new ResizeObserver(() => {
   renderSourceMark();
   sizeColors();
