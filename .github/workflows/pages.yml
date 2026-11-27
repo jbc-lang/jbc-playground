@@ -29,6 +29,8 @@ jobs:
         run: |
           bun install --frozen-lockfile
           bun build-static.mjs
+      - name: Check the toolchain on jsDelivr
+        run: bun tools/check-cdn.mjs
       - name: Run browser tests
         run: |
           bunx playwright install --with-deps chromium

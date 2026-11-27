@@ -7,8 +7,9 @@ compiler, runtime, and native CLI.
 
 ## How the playground works
 
-GitHub Pages serves the editor and toolchain files. Compilation and
-execution happen in your browser.
+GitHub Pages serves the editor and the jbcc wheel; jsDelivr serves the
+Pyodide and Clang toolchain. Compilation and execution happen in your
+browser.
 
 ```mermaid
 flowchart LR
@@ -103,8 +104,18 @@ the process and port numbers, and an empty OS login.
 
 The lockfile records the npm integrity hashes for Pyodide 314.0.8,
 YoWASP Clang 21.1.4-3 (including the WASI sysroot), and browser_wasi_shim
-0.4.2. The build copies the package toolchain assets into versioned
-paths. See the [Pyodide license](https://github.com/pyodide/pyodide/blob/main/LICENSE),
+0.4.2.
+
+The page loads Pyodide and Clang from jsDelivr at the versions in
+`package.json` ([toolchain.mjs](toolchain.mjs)), so the site itself is a
+few hundred kilobytes rather than 122 MB. jsDelivr serves npm packages by
+exact version, Brotli-compressed with a one-year immutable cache, and npm
+never republishes a version. `just check-cdn`, which CI runs before the
+browser tests, checks that every toolchain file on jsDelivr matches the
+locked package in `node_modules` byte for byte. Browsers cannot verify a
+dynamically imported module or the libraries' own fetches against a hash,
+so this check, done at build time, is what ties the served toolchain to
+the lockfile. See the [Pyodide license](https://github.com/pyodide/pyodide/blob/main/LICENSE),
 [YoWASP package license and upstream sources](https://codeberg.org/YoWASP/clang),
 [LLVM license](https://llvm.org/LICENSE.txt),
 [wasi-libc license](https://github.com/WebAssembly/wasi-libc/blob/main/LICENSE),
@@ -125,6 +136,15 @@ Set `JBCC_PLAYWRIGHT_CHANNEL=chrome` to use a local Google Chrome
 installation. For Playwright Firefox or WebKit, install the engines with
 `bunx playwright install firefox webkit` and set
 `JBCC_PLAYWRIGHT_BROWSER` to `firefox` or `webkit`.
+
+The tests build and load the published page, which asks jsDelivr for the
+toolchain, but [tests/cdn.ts](tests/cdn.ts) answers those requests from
+`node_modules`: the same bytes, offline and without loading the CDN on
+every run. `tests/toolchain.spec.ts` checks that every toolchain request
+is answered that way, and `tests/cdn.spec.ts`, the one test without the
+routing, compiles and runs a program with the toolchain from the real
+jsDelivr. `just dev` loads the toolchain from jsDelivr, so it needs the
+network once; the browser then caches it.
 
 To test a deployed build, set `JBCC_PLAYGROUND_URL` to the site URL
 including its trailing slash. The build from `just build` supplies the

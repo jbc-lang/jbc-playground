@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./cdn";
 import { readFileSync } from "node:fs";
 
 const fixture = (path: string) => readFileSync(new URL(`fixtures/includes/${path}`, import.meta.url), "utf8");

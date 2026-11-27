@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./cdn";
 
 const link = (source: string) => "./#name=report&code=" + Buffer.from(source, "utf8").toString("base64url");
 
