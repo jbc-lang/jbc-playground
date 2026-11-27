@@ -13,6 +13,11 @@ dev port="18767": build
 words:
     uvx --from "jbcc==$(sed -n 's/^export const version = "\(.*\)";/\1/p' jbcc-wheel.mjs)" python tools/jbc-words.py > web/jbc-words.json
 
+# Check that jsDelivr serves the locked toolchain files byte for byte.
+check-cdn:
+    bun install --frozen-lockfile
+    bun tools/check-cdn.mjs
+
 # Build and run the browser suite.
 test *args: build
     bunx playwright test "$@"

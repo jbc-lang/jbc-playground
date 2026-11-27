@@ -1,9 +1,11 @@
 # Browser toolchain notices
 
-The playground serves the following dependencies from the pinned packages
-in [bun.lock](bun.lock).
+The playground uses the following dependencies, pinned in
+[bun.lock](bun.lock) and [jbcc-wheel.mjs](jbcc-wheel.mjs). The site serves
+the jbcc wheel and browser_wasi_shim; browsers load Pyodide and YoWASP
+Clang from jsDelivr, which serves the same npm package versions unchanged.
 
-- The [jbcc wheel](https://pypi.org/project/jbcc/0.2.0/) includes the C
+- The [jbcc wheel](https://pypi.org/project/jbcc/) includes the C
   runtime and its license files. The build verifies the pinned SHA-256.
 - Pyodide 314.0.8 includes CPython and its standard library. See the
   [Pyodide sources and license](https://github.com/pyodide/pyodide/tree/314.0.8)

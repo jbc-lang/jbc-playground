@@ -1,6 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./cdn";
 import { readFileSync } from "node:fs";
 import { wheelName } from "../jbcc-wheel.mjs";
+import { cdn, clangURL, pyodideURL } from "../toolchain.mjs";
 
 
 test("runs another program offline after loading the toolchain", async ({ context, page }) => {
@@ -19,7 +20,8 @@ test("runs another program offline after loading the toolchain", async ({ contex
 
   const prefix = new URL("./", page.url());
   expect(requests).toContain(new URL(`python/${wheelName}`, prefix).pathname);
-  expect(requests.some((path) => path.startsWith(`${prefix.pathname}toolchain/`) && path.endsWith(".wasm"))).toBe(true);
+  // The toolchain comes from jsDelivr (answered from node_modules in tests).
+  expect(requests.some((path) => path.startsWith(new URL(cdn).pathname) && path.endsWith(".wasm"))).toBe(true);
   const factorial = readFileSync(new URL("../examples/factorial.b", import.meta.url), "utf8");
   await context.setOffline(true);
   await page.getByLabel("jBC source").fill(factorial);
@@ -30,13 +32,13 @@ test("runs another program offline after loading the toolchain", async ({ contex
 });
 
 for (const [statusText, asset, body] of [
-  ["Loading Python…", "**/toolchain/**/pyodide.mjs", "await new Promise(() => {});"],
-  ["Compiling C…", "**/toolchain/**/bundle.js", "export const commands = { clang: () => new Promise(() => {}) };"],
+  ["Loading Python…", pyodideURL, "await new Promise(() => {});"],
+  ["Compiling C…", clangURL, "export const commands = { clang: () => new Promise(() => {}) };"],
 ]) {
   test(`stops during ${statusText} and can start a fresh compiler`, async ({ page }) => {
     await page.route(asset, (route) => route.fulfill({
       contentType: "application/javascript",
-      headers: { "Cache-Control": "no-store" },
+      headers: { "Access-Control-Allow-Origin": "*", "Cache-Control": "no-store" },
       body,
     }), { times: 1 });
     await page.goto("./");

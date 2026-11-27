@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./cdn";
 
 const link = (source: string) => "./#name=colours&code=" + Buffer.from(source, "utf8").toString("base64url");
 const colors = (page: Page) => page.locator("#source-colors");

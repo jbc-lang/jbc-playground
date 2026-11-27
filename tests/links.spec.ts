@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./cdn";
 
 // Links such as #name=locate&code=<base64url>, made by the jBC guide's "Run" buttons.
 const link = (source: string, name?: string) =>
