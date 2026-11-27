@@ -26,6 +26,20 @@ test("opens linked source as a named file and clears the address", async ({ page
   await expect(source(page)).toHaveValue(code);
 });
 
+test("runs a linked source at once when the link says run=1", async ({ page }) => {
+  await page.goto(link("CRT \"Hello, jBC!\"\n", "preface") + "&run=1");
+  await expect(page.locator("#filename")).toHaveValue("preface.b");
+  await expect(page.locator("#status")).toHaveText("Exited with status 0", { timeout: 45_000 });
+  await expect(page.locator("#stdout")).toHaveText("Hello, jBC!");
+});
+
+test("only opens a linked source without run=1", async ({ page }) => {
+  await page.goto(link("CRT 1\n", "plain"));
+  await expect(page.locator("#filename")).toHaveValue("plain.b");
+  await expect(page.locator("#status")).toHaveText("Ready");
+  await expect(page.locator("#stdout")).toHaveText("");
+});
+
 test("uses main.b for a missing or unsafe name", async ({ page }) => {
   await page.goto(link("CRT 1\n", "../x"));
   await expect(page.locator("#filename")).toHaveValue("main.b");
