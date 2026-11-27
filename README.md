@@ -66,10 +66,13 @@ editor keeps its working draft and reports a conflict. Save under a
 different name to keep both versions.
 
 A link such as `https://online.jbc-lang.org/#name=locate&code=<source>`
-opens a source as a new draft named `locate.b`, without running it. The
-[jBC guide](https://jbc-lang.org/) makes these links for its **Run**
-buttons. `code` is the UTF-8 source in unpadded base64url, up to 64 KiB;
-`name` is optional and must be a plain file name, or the file is `main.b`.
+opens a source as a new draft named `locate.b`. `run=1` also runs it at
+once, as if **Run** had been pressed; without it the link only opens the
+source, so a shared link never runs code before a click. The
+[jBC guide](https://jbc-lang.org/) makes these links, with `run=1`, for
+its **Run** buttons. `code` is the UTF-8 source in unpadded base64url, up
+to 64 KiB; `name` is optional and must be a plain file name, or the file
+is `main.b`.
 The source sits in the fragment, so it never reaches a server; the editor
 removes the fragment at once, and the Google tag reports the address
 without it. If the draft that a link replaces has unsaved work, the editor

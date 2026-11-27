@@ -332,10 +332,12 @@ async function loadExample(key: keyof typeof exampleFiles) {
 }
 
 // A link such as https://online.jbc-lang.org/#name=locate&code=<base64url>
-// opens that source as a new draft; the jBC guide's "Run" buttons make them.
+// opens that source as a new draft; the jBC guide's "Run" buttons make them
+// and add run=1, which also runs it at once. Without run=1 a link only opens
+// the source, so a shared link never runs code before a click on Run.
 // The source travels in the fragment, so it never reaches a server, and the
 // fragment is removed at once so that a reload does not open it again.
-type LinkedSource = { path: string; source: string; name: string };
+type LinkedSource = { path: string; source: string; name: string; run: boolean };
 
 function linkedSource(): LinkedSource | "invalid" | null {
   const params = new URLSearchParams(location.hash.slice(1));
@@ -348,7 +350,7 @@ function linkedSource(): LinkedSource | "invalid" | null {
     const source = new TextDecoder("utf-8", { fatal: true }).decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
     const name = params.get("name") ?? "";
     const safe = /^[A-Za-z0-9_][A-Za-z0-9_.-]{0,63}$/.test(name);
-    return { path: safe ? `${name}.b` : "main.b", source, name: safe ? name : "" };
+    return { path: safe ? `${name}.b` : "main.b", source, name: safe ? name : "", run: params.get("run") === "1" };
   } catch {
     return "invalid";
   }
@@ -847,13 +849,18 @@ if (localProject) {
   if (localProject.savedVersion !== draftVersion) scheduleSave();
 }
 const linked = linkedSource();
-if (linked && linked !== "invalid") openLinked(linked);
-else if (!saved) void loadExample("hello");
+if (linked && linked !== "invalid") {
+  openLinked(linked);
+  if (linked.run) void runProgram();
+} else if (!saved) void loadExample("hello");
 if (linked === "invalid") reportInvalidLink();
 // A link opened in a tab that already shows the playground.
 window.addEventListener("hashchange", () => {
   const next = linkedSource();
   if (!next) return;
   if (next === "invalid") reportInvalidLink();
-  else if (!activity && !projectBusy && confirm("Replace the current draft with the linked source?")) openLinked(next);
+  else if (!activity && !projectBusy && confirm("Replace the current draft with the linked source?")) {
+    openLinked(next);
+    if (next.run) void runProgram();
+  }
 });
