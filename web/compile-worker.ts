@@ -46,11 +46,12 @@ function diagnostics(text: string): Diagnostic[] {
   return text.trim().split("\n").filter(Boolean).map((line) => {
     const match = /^(.*?):(\d+):(\d+):\s*(.*)$/.exec(line);
     const message = match?.[4] ?? line;
-    const warning = message.startsWith("warning: ");
+    // jbcc's "note:" lines are information, such as using its built-in JBC.h.
+    const severity = message.startsWith("warning: ") ? "warning" : message.startsWith("note: ") ? "note" : "error";
     return {
       ...(match && { path: match[1], line: Number(match[2]), column: Number(match[3]) }),
-      severity: warning ? "warning" : "error",
-      message: warning ? message.slice(9) : message,
+      severity,
+      message: severity === "error" ? message : message.slice(severity.length + 2),
     };
   });
 }
