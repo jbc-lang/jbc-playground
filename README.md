@@ -22,7 +22,7 @@ flowchart LR
 
 1. **Pyodide runs the jBC compiler.** Pyodide is CPython compiled to Wasm.
    On the first **Run**, a browser worker starts Pyodide and loads the pinned
-   `jbcc 0.3.0` Python wheel. The site build downloads the wheel from PyPI,
+   `jbcc 0.4.0` Python wheel. The site build downloads the wheel from PyPI,
    verifies its SHA-256 hash, and serves it with the other static assets.
    [Compiler worker](web/compile-worker.ts) · [Pyodide](https://pyodide.org/en/stable/project/about.html)
 2. **jbcc translates jBC to C.** The Python adapter stages the project in a
