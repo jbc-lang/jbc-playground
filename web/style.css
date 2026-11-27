@@ -10,6 +10,7 @@
   --accent: #f2bb76;
   --accent-text: #241807;
   --error: #ffad9f;
+  --note: #8fd19e;
   --error-line: #492e32;
   --error-column: #794446;
   --mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
@@ -35,6 +36,7 @@
   --accent: #995110;
   --accent-text: #fff;
   --error: #952c23;
+  --note: #2f7d32;
   --error-line: #fae2df;
   --error-column: #f3b8b0;
   /* The same hues, dark enough for a white editor. */
@@ -398,6 +400,7 @@ main {
   padding: 0;
 }
 #diagnostics [data-severity="error"], #stderr { color: var(--error); }
+#diagnostics [data-severity="note"] { color: var(--note); }
 .streams {
   display: grid;
   grid-template-rows: minmax(8rem, 1fr) minmax(6rem, 0.55fr);

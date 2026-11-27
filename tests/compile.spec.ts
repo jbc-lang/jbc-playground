@@ -77,3 +77,25 @@ test("enforces the expanded source limit", async ({ page }) => {
   ]);
   await expectDiagnostic(page, "expanded source limit exceeded");
 });
+
+test("shows jbcc's built-in JBC.h note as a note, not an error", async ({ page }) => {
+  await openProject(page, "cache.b", [{ path: "cache.b", source: "INCLUDE JBC.h\nCRT JBASE_CRYPT_ROT13\n" }]);
+  await page.getByRole("button", { name: "Run", exact: true }).click();
+  await expect(page.locator("#status")).toHaveText("Exited with status 0", { timeout: 45_000 });
+  const note = page.locator('#diagnostics p[data-severity="note"]');
+  await expect(note).toContainText("using jbcc's built-in JBC.h");
+  await expect(page.locator('#diagnostics p[data-severity="error"]')).toHaveCount(0);
+  const [noteColour, errorColour] = await page.evaluate(() => {
+    const style = getComputedStyle(document.documentElement);
+    return [style.getPropertyValue("--note"), style.getPropertyValue("--error")];
+  });
+  await expect(note).toHaveCSS("color", await page.evaluate((c) => {
+    const probe = document.createElement("span");
+    probe.style.color = c;
+    document.body.append(probe);
+    const rgb = getComputedStyle(probe).color;
+    probe.remove();
+    return rgb;
+  }, noteColour.trim()));
+  expect(noteColour).not.toBe(errorColour);
+});
