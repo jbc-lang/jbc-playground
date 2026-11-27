@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
-export const version = "0.7.0";
+export const version = "0.8.1";
 export const wheelName = `jbcc-${version}-py3-none-any.whl`;
-const url = `https://files.pythonhosted.org/packages/cf/98/c1038e2e3d75abb4b4a3e47501464bf4ef844669e65b231eb824f4c91844/${wheelName}`;
-const sha256 = "33d9bdc6901e962ead708c5fc3446324a3373dbbeaea1f3e5b0d10c066f3fcb1";
+const url = `https://files.pythonhosted.org/packages/ae/aa/cc796685fea9e442362c5d455f6f08c6c7deaaa26b504c24e6554fe350b8/${wheelName}`;
+const sha256 = "5371f97c13adde54cc5c42b09a245aef861292effa7ae492d90edf7830bd6806";
 
 export async function downloadWheel() {
   const response = await fetch(url, { signal: AbortSignal.timeout(30_000) });

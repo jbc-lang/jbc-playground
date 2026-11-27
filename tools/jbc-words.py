@@ -30,8 +30,11 @@ source = inspect.getsource(compiler)
 compared = set()
 for match in re.finditer(r"\.word\s*(?:==|!=)\s*'([A-Z][A-Z0-9.$]*)'", source):
     compared.add(match.group(1))
-for match in re.finditer(r"\.word\s*(?:not\s+)?in\s*[\(\{]([^\)\}]*)[\)\}]", source):
+# Also a set added to a named table, as in `.word in SELECT_WORDS | {'READNEXT'}`.
+for match in re.finditer(r"\.word\s*(?:not\s+)?in\s*(?:[A-Z_]+\s*\|\s*)?[\(\{]([^\)\}]*)[\)\}]", source):
     compared.update(re.findall(r"'([A-Z][A-Z0-9.$]*)'", match.group(1)))
+# Statement words checked with statement_word('OUT') and the like.
+compared.update(re.findall(r"statement_word\(\s*'([A-Z][A-Z0-9.$]*)'\s*\)", source))
 for name in dir(compiler):
     value = getattr(compiler, name)
     if name.isupper() and isinstance(value, (set, frozenset)) and all(isinstance(v, str) for v in value):
@@ -71,7 +74,10 @@ def refused(words):
     return sorted(found)
 
 
-unavailable = refused(statements + functions)
+# A host-only statement whose word is also a clause the browser accepts:
+# IN reads a byte, but LOCATE x IN A works everywhere.
+CLAUSE_WORDS = {"IN"}
+unavailable = [word for word in refused(statements + functions) if word not in CLAUSE_WORDS]
 json.dump(
     {
         "jbcc": getattr(jbcc, "__version__", None) or __import__("importlib.metadata").metadata.version("jbcc"),
